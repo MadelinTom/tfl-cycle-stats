@@ -1,11 +1,9 @@
 import csv
-from operator import itemgetter
 from datetime import datetime
-from symbol import comparison
 
 DATE_FORMAT = '%d/%m/%Y %H:%M'
 DATE_FORMAT_MILLIS = '%d/%m/%Y %H:%M:%S'
-file_name = 'all_trips.csv'
+file_name = 'tfl-cycle-2015-2017.csv'
 
 # get statistics from the csv file
 with open(file_name) as csv_file:
@@ -36,23 +34,8 @@ with open(file_name) as csv_file:
                 if (row[6] != "0"):
                     individual_trips += [[row[6], row[8], ">", row[5]]]
 
-            # longest and shortest journeys
-            # if (int(row[1]) > longest_journey):
-            #     longest_journey = int(row[1])
-
-            # if(int(row[1]) < shortest_journey):
-            #     shortest_journey = int(row[1])
-
-    # trips for individual bike in chronological order
-    # bike_id_trips_chronological = sorted(bike_id_trip_list, key=itemgetter(6))
-    # for s in bike_id_trips_chronological:
-    #     print(*s)
-    
-    # print("-----------------------------------")
-
     def comparison_with_or_without_milli_seconds(x):
         return_object = datetime.now()
-        # print(x)
 
         if (x[0] != '0' and x[0] != ''): # need this due to faulty data in set
             try:
@@ -64,23 +47,18 @@ with open(file_name) as csv_file:
 
     # start and end journeys in chronological order
     individual_trips_chronological = sorted(individual_trips, key=lambda x: comparison_with_or_without_milli_seconds(x))
-    # key=itemgetter(0)
-    # key=lambda x: datetime.strptime(x[1],'%d/%m/%Y')
+
     for i in individual_trips_chronological:
         print(*i)
 
     # open file
-    f = open('./1171_trips.csv', 'w')
+    f = open('./1171_trips_all.csv', 'w')
     # create the csv writer
     writer = csv.writer(f)
     for row in individual_trips_chronological:
         writer.writerow(row)
     # close the file
     f.close()
-    
 
     print(f'Processed {line_count} trips.')
     print(f'Bike trips {bike_id_trips}.')
-    # print(f'Bike trips list {bike_id_trip_list}.')
-    # print(f'Longest journey: {longest_journey}.')
-    # print(f'Shortest journey: {shortest_journey}.')

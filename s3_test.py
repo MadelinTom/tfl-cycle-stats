@@ -2,18 +2,11 @@ import requests, json, csv
 
 urls = []
 
-# with open('journey_links.json') as json_file:
-#     json_object = json.load(json_file)
-
-#     for object in json_object["entries"]:
-#         print(object["url"])
-
 #  get all urls
 with open('journey_links.json') as json_file:
     json_object = json.load(json_file)
 
     for object in json_object["entries"]:
-        # print(object["url"])
         urls += [object["url"]]
 
 # print urls
@@ -21,7 +14,7 @@ for url in urls:
     print(url)
 
 # open file
-f = open('./all_trips.csv', 'w')
+f = open('./all_trips_2.csv', 'w')
 # create the csv writer
 writer = csv.writer(f)
 
