@@ -1,8 +1,11 @@
 import requests
 import json
 import csv
+from datetime import datetime
 
 urls = []
+DATE_FORMAT = '%d/%m/%Y %H:%M'
+DATE_FORMAT_MILLIS = '%d/%m/%Y %H:%M:%S'
 
 #  get all urls
 with open('journey_links.json') as json_file:
@@ -46,11 +49,47 @@ for url in urls:
                 # ignore any rows with missing data
                 if (row[0] == '' or row[1] == '' or row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '' or row[6] == '' or row[7] == '' or row[8] == ''):
                     print(f"Empty field! \n {row}")
+                    continue
+
+                # if datetime is wrong format force correct format
+                # row[3] & row[6]
+                end_date = row[3]
+                start_date = row[6]
+
+                # HACK: due to the way datetime.strptime works it cannot be used as boolean, we have to catch the exception raised and try to convert
+                if not (row[0] == '' or row[1] == '' or row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '' or row[6] == '' or row[7] == '' or row[8] == ''):
+                    # HACK: see below conidional regarding row[6]
+                    if (len(row) == 10):
+                        start_date = row[7]
+                    try:
+                        date = datetime.strptime(end_date, DATE_FORMAT)
+                    except ValueError as err:
+                        print(err)
+                        try:
+                            temp = datetime.strptime(end_date, DATE_FORMAT_MILLIS)
+                            row[3] = temp.strftime(DATE_FORMAT)
+                        except ValueError as err:
+                            continue
+
+                    try:
+                        date = datetime.strptime(start_date, DATE_FORMAT)
+                    except ValueError as err:
+                        print(err)
+                        try:
+                            temp = datetime.strptime(start_date, DATE_FORMAT_MILLIS)
+                            # HACK: see below conditional regarding row[6]
+                            if (len(row) == 10):
+                                row[7] = temp.strftime(DATE_FORMAT)
+                            else:
+                                row[6] = temp.strftime(DATE_FORMAT)
+                        except ValueError as err:
+                            continue
+                            
 
                 # TODO: ignore rows that have the wrong data type in the corresponding column
                 # check for start date being '0' or '1' here (row[6])
                 # HACK: The only rows with startdate being '0' or '1' have a length of 10
-                elif (len(row) == 10):
+                if (len(row) == 10):
                     print("Length of row = 10, ignoring row[6]")
                     writer.writerow(
                         [row[0], row[1], row[2], row[3], row[4], row[5], row[7], row[8], row[9]])
